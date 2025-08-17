@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="assets/auth.css" />
+    <link rel="stylesheet" href="assets/files.css" />
+  </head>
+  <body>
+    <div class="main-container">
+      <div class="main-header">
+        <h1>Enter API credentials</h1>
+        <p>OAuth credentials to be able to see your files from Google Drive</p>
+      </div>
+
+      <div class="setup">
+        <h3>📋 Setup your connection</h3>
+        <button class="setup-header" onclick="showSetup()">&times;</button>
+
+        <ul class="setup-steps">
+          <li>
+            Go to
+            <a
+              href="https://console.cloud.google.com/"
+              target="_blank"
+              class="help-link"
+            >
+              Google Cloud Console
+            </a>
+          </li>
+          <li>Create a new project</li>
+          <li>Enable the Google Drive API</li>
+          <li>Create OAuth 2.0 credentials (Web application type)</li>
+          <li>Paste your Client ID and Secret below</li>
+
+          <li>
+            Now go to
+            <a
+              href="https://developers.google.com/oauthplayground"
+              target="_blank"
+              class="help-link"
+            >
+              Developers playground
+            </a>
+          </li>
+          <li>Select the Drive API v3</li>
+          <li>Select and authorize custom scopes</li>
+          <li>Exchange your codes for refresh token and paste below</li>
+        </ul>
+      </div>
+
+      <form>
+        <div class="form-item">
+          <label for="clientId">Client ID *</label>
+          <input
+            type="text"
+            name="clientId"
+            required
+            placeholder="OAuth 2.0 Client ID from Google Cloud Console"
+          />
+        </div>
+        <div class="form-item">
+          <label for="clientSecret">Client secret *</label>
+          <input
+            type="password"
+            name="clientSecret"
+            required
+            placeholder="GOCSPX-abcdefghijklmnopqrstuvwxyz"
+          />
+        </div>
+        <div class="form-item">
+          <label for="refreshToken">Refresh token *</label>
+          <input
+            type="password"
+            name="refreshToken"
+            required
+            placeholder="Generated when exchange your authorization codes"
+          />
+        </div>
+
+        <button type="submit" class="submit-btn">Start</button>
+      </form>
+    </div>
+
+    <div class="status-message">
+      <button class="status-header" onclick="hideMessage()">&times;</button>
+      <p></p>
+    </div>
+
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Processing...</p>
+    </div>
+
+    <div class="files-container">
+      <div class="section-header">
+        <h2>Google Drive Files</h2>
+
+        <div class="header-actions">
+          <button class="btn default-folders" onclick="setDefaultFolders()">
+            Add default folders
+          </button>
+
+          <input
+            type="text"
+            id="defaultFolders"
+            placeholder="Add folders in your Google Drive"
+          />
+        </div>
+      </div>
+
+      <div class="files-section">
+        <h2 class="files-header">Files from ./</h2>
+
+        <div class="files-grid"></div>
+      </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/files.js"></script>
+    <script src="js/downloadSync.js"></script>
+
+    <script>
+      const form = document.querySelector("form");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const fd = new FormData(form);
+        const urlEncoded = new URLSearchParams(fd).toString();
+
+        var response = await fetch("/api/auth/save", {
+          method: "POST",
+          body: urlEncoded,
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        });
+
+        if (response.ok) {
+          form.reset();
+
+          // Hide the main content
+          document.querySelector(".main-container").style.display = "none";
+          document.querySelector(".files-container").style.display = "block";
+          setTimeout(showDefaultFiles(), 8000);
+
+          // Check the activity every 6 hours
+          setInterval(() => {
+            checkActivity();
+          }, 21600 * 1000);
+
+          return;
+        }
+        showMessage(await response.text());
+      });
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const response = await fetch("/api/auth/session");
+
+        if (response.ok) setTimeout(showDefaultFiles(), 8000);
+
+        return;
+      });
+    </script>
+  </body>
+</html>

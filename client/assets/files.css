@@ -1,0 +1,124 @@
+.section-header {
+  text-align: center;
+  margin-bottom: 20px;
+  color: white;
+}
+.section-header h2 {
+  margin-bottom: 20px;
+  font-size: 3rem;
+  font-weight: 300;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.header-actions input {
+  display: none;
+  width: 21%;
+  padding: 8px;
+  border: 2px solid #e1e5e9;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background: #fff;
+}
+
+.files-section {
+  margin-top: 50px;
+}
+.files-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  margin-bottom: 30px;
+  color: #ffffff;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 15px;
+}
+.files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+  gap: 5px;
+  margin-bottom: 40px;
+}
+
+.file-card.hidden {
+  display: none;
+}
+
+.file-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.4s ease;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+}
+.file-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+.file-name {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  color: #ffffff;
+}
+.file-icon {
+  font-size: 1.8rem;
+  opacity: 0.8;
+}
+
+.actions-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn {
+  background: linear-gradient(45deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+.btn:hover {
+  transform: translateY(3px);
+}
+
+.no-data {
+  text-align: center;
+}
+.remove {
+  font-size: 35px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.btn.sync {
+  display: none;
+  background: linear-gradient(45deg, #5855eb, #7c3aed);
+}
+.view-all-btn {
+  position: absolute;
+  border: none;
+  background: none;
+  color: white;
+  font-size: 16px;
+  right: 25px;
+  bottom: 20px;
+  cursor: pointer;
+}
+.view-all-btn:hover {
+  text-decoration: underline;
+}

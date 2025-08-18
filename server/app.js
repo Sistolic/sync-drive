@@ -20,11 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static("client"));
 
-app.use("/api/drive", limiter, driveRoutes);
-app.use("/api/auth", limiter, authRoutes);
+app.use("/api/drive", driveRoutes);
+app.use("/api/auth", authRoutes);
 
 // port
 const port = 3000 || process.env.PORT;
-app.listen(port, () =>
-  console.log(`App available on http://localhost:${port}`)
-);
+app.listen(port, () => console.log(`App available`));

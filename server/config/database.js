@@ -41,6 +41,9 @@ class Database {
     const start = new Date();
     if (!this.pool) await this.init();
 
+    const test = await this.pool.query(`SELECT * FROM user_credentials`);
+    console.log("Data requested from database:", test);
+
     try {
       const { clientId, clientSecret, refreshToken } = req.body;
       const credentials = {
@@ -73,10 +76,6 @@ class Database {
         ]
       );
 
-      if (result[0].affectedRows === 0) {
-        return res.status(404).send("Error creating the session");
-      }
-
       // the cookie will expire and the store credentials will be removed
       res.cookie("session", sessionId, {
         expires: new Date(Date.now() + 21600 * 1000),
@@ -84,6 +83,7 @@ class Database {
         secure: true,
         sameSite: "lax",
       });
+      console.log("Session created!!!");
 
       console.log("Database response in", new Date() - start, ":", result);
 

@@ -3,7 +3,7 @@ const crypto = require("crypto");
 
 const algorithm = process.env.ALGORITHM;
 
-const key = crypto.randomBytes(32).toString("hex");
+const key = process.env.KEY.toString("hex");
 const IV_LENGTH = parseInt(process.env.IV_LENGTH);
 
 function encrypt(text, iv) {

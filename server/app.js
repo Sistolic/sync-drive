@@ -25,4 +25,6 @@ app.use("/api/auth", limiter, authRoutes);
 
 // port
 const port = 3000 || process.env.PORT;
-app.listen(port, () => console.log("App available on http://localhost:port"));
+app.listen(port, () =>
+  console.log(`App available on http://localhost:${port}`)
+);

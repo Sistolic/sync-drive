@@ -3,13 +3,13 @@ const crypto = require("crypto");
 
 const algorithm = process.env.ALGORITHM;
 
-var key = process.env.KEY;
+var key = process.env.ENCRYPTION_KEY;
 key = key.toString("hex");
 
 const IV_LENGTH = parseInt(process.env.IV_LENGTH);
 
 function encrypt(text, iv) {
-  console.log("Encryption key:", key);
+  console.log("Encryption key:", key.length);
   try {
     const cipher = crypto.createCipheriv(
       algorithm,

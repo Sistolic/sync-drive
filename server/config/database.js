@@ -19,7 +19,6 @@ class Database {
         database: process.env.MYSQL_DB,
         port: process.env.MYSQL_PORT || 3306,
 
-        reconnect: true,
         ssl: { rejectUnauthorized: false },
       })
       .promise();
@@ -40,6 +39,7 @@ class Database {
   }
 
   saveCredentials = async (req, res) => {
+    const start = new Date();
     if (!this.pool) await this.init();
 
     try {
@@ -54,7 +54,6 @@ class Database {
         res.status(404).send("Invalid credentials");
 
       const sessionId = uuidv4();
-
       const encryptedData = encryption.encryptCredentials(credentials);
 
       if (!encryptedData) {
@@ -86,6 +85,8 @@ class Database {
         secure: true,
         sameSite: "lax",
       });
+
+      console.log("Databse response in", new Date() - start, ":", result);
 
       res.status(200).send("You can now see your Drive files");
     } catch (error) {

@@ -20,7 +20,6 @@ class Database {
         port: process.env.MYSQL_PORT || 3306,
 
         reconnect: true,
-        idleTimeout: 30000,
         ssl: { rejectUnauthorized: false },
       })
       .promise();

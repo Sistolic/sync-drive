@@ -1,4 +1,4 @@
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
 const dotenv = require("dotenv").config();
 
 const drive = require("./drive");
@@ -7,24 +7,26 @@ const uuidv4 = require("uuid").v4;
 
 class Database {
   constructor() {
+    this.config = {
+      host: process.env.MYSQL_HOST,
+      user: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DB,
+      port: process.env.MYSQL_PORT || 3306,
+      connectionLimit: 10,
+      reconnect: true,
+      ssl: { rejectUnauthorized: false },
+    };
+
     this.pool = null;
   }
 
   async init() {
-    this.pool = mysql
-      .createPool({
-        host: process.env.MYSQL_HOST,
-        user: process.env.MYSQL_USER,
-        password: process.env.MYSQL_PASSWORD,
-        database: process.env.MYSQL_DB,
-        port: process.env.MYSQL_PORT || 3306,
-        ssl: { rejectUnauthorized: false },
-      })
-      .promise();
+    this.pool = mysql.createPool(this.config);
   }
 
   async validateSession(sessionId) {
-    if (!this.pool) await this.init();
+    await this.init();
 
     const [rows] = await this.pool.query(
       `
@@ -39,12 +41,13 @@ class Database {
 
   saveCredentials = async (req, res) => {
     const start = new Date();
-    if (!this.pool) await this.init();
-
-    const test = await this.pool.query(`SELECT * FROM user_credentials`);
-    console.log("Data requested from database:", test);
+    await this.init();
 
     try {
+      const connection = await this.pool.getConnection();
+      await connection.ping();
+      connection.release();
+
       const { clientId, clientSecret, refreshToken } = req.body;
       const credentials = {
         clientId: clientId,
@@ -93,7 +96,7 @@ class Database {
     }
   };
   async getCredentials(sessionId) {
-    if (!this.pool) await this.init();
+    await this.init();
 
     const [rows] = await this.pool.query(
       `
@@ -108,7 +111,7 @@ class Database {
       : undefined;
   }
   deleteCredentials = async (req, res) => {
-    if (!this.pool) await this.init();
+    await this.init();
     const sessionId = req.cookies["sessionId"];
 
     const result = await this.pool.query(
@@ -123,7 +126,7 @@ class Database {
   };
   // update the session if the user is still active
   updateCredentials = async (req, res) => {
-    if (!this.pool) await this.init();
+    await this.init();
 
     const oldSession = req.cookies["sessionId"];
     const newSession = uuidv4();

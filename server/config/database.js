@@ -18,7 +18,6 @@ class Database {
         password: process.env.MYSQL_PASSWORD,
         database: process.env.MYSQL_DB,
         port: process.env.MYSQL_PORT || 3306,
-
         ssl: { rejectUnauthorized: false },
       })
       .promise();
@@ -86,7 +85,7 @@ class Database {
         sameSite: "lax",
       });
 
-      console.log("Databse response in", new Date() - start, ":", result);
+      console.log("Database response in", new Date() - start, ":", result);
 
       res.status(200).send("You can now see your Drive files");
     } catch (error) {

@@ -10,7 +10,7 @@ exports.testConnection = async (credentials) => {
     const auth = new google.auth.OAuth2(
       credentials.clientId,
       credentials.clientSecret,
-      process.env.REDIRECT_URL || credentials.redirectUrl
+      process.env.REDIRECT_URL
     );
     auth.setCredentials({ refresh_token: credentials.refreshToken });
 
@@ -33,7 +33,6 @@ exports.testConnection = async (credentials) => {
   }
 };
 
-// The key generated is change when the file system is updated
 const activeConnections = new Map();
 
 exports.getDrive = async (sessionId) => {

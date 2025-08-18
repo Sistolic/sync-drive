@@ -9,7 +9,6 @@ key = key.toString("hex");
 const IV_LENGTH = parseInt(process.env.IV_LENGTH);
 
 function encrypt(text, iv) {
-  console.log("Encryption key:", key.length);
   try {
     const cipher = crypto.createCipheriv(
       algorithm,

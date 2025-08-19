@@ -5,6 +5,7 @@ const limiter = rateLimit({
   limit: 10,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },
 });
 
 exports.limiter = limiter;

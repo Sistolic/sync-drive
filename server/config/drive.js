@@ -27,8 +27,6 @@ exports.testConnection = async (credentials) => {
     };
 
     var response = await drive.files.list(requestParams);
-
-    console.log("Data requested for testing:", response.data);
     return response.data.files ? true : false;
   } catch (error) {
     return false;

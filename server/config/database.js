@@ -12,9 +12,7 @@ class Database {
       user: process.env.MYSQL_USER,
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DB,
-      port: process.env.MYSQL_PORT || 3306,
-      connectionLimit: 10,
-      reconnect: true,
+      port: process.env.MYSQL_PORT,
       ssl: { rejectUnauthorized: false },
     };
 
@@ -26,7 +24,7 @@ class Database {
   }
 
   async validateSession(sessionId) {
-    await this.init();
+    if (!this.pool) await this.init();
 
     const [rows] = await this.pool.query(
       `
@@ -40,14 +38,9 @@ class Database {
   }
 
   saveCredentials = async (req, res) => {
-    const start = new Date();
-    await this.init();
+    if (!this.pool) await this.init();
 
     try {
-      const connection = await this.pool.getConnection();
-      await connection.ping();
-      connection.release();
-
       const { clientId, clientSecret, refreshToken } = req.body;
       const credentials = {
         clientId: clientId,
@@ -86,9 +79,6 @@ class Database {
         secure: true,
         sameSite: "lax",
       });
-      console.log("Session created!!!");
-
-      console.log("Database response in", new Date() - start, ":", result);
 
       res.status(200).send("You can now see your Drive files");
     } catch (error) {
@@ -96,7 +86,7 @@ class Database {
     }
   };
   async getCredentials(sessionId) {
-    await this.init();
+    if (!this.pool) await this.init();
 
     const [rows] = await this.pool.query(
       `
@@ -111,7 +101,7 @@ class Database {
       : undefined;
   }
   deleteCredentials = async (req, res) => {
-    await this.init();
+    if (!this.pool) await this.init();
     const sessionId = req.cookies["sessionId"];
 
     const result = await this.pool.query(
@@ -126,7 +116,7 @@ class Database {
   };
   // update the session if the user is still active
   updateCredentials = async (req, res) => {
-    await this.init();
+    if (!this.pool) await this.init();
 
     const oldSession = req.cookies["sessionId"];
     const newSession = uuidv4();

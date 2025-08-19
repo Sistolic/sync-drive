@@ -143,13 +143,8 @@
           // Hide the main content
           document.querySelector(".main-container").style.display = "none";
           document.querySelector(".files-container").style.display = "block";
-          setTimeout(showDefaultFiles(), 8000);
 
-          // Check the activity every 6 hours
-          setInterval(() => {
-            checkActivity();
-          }, 21600 * 1000);
-
+          showDefaultFiles();
           return;
         }
         showMessage(await response.text());
@@ -158,7 +153,7 @@
       document.addEventListener("DOMContentLoaded", async () => {
         const response = await fetch("/api/auth/session");
 
-        if (response.ok) setTimeout(showDefaultFiles(), 8000);
+        if (response.ok) showDefaultFiles();
 
         return;
       });

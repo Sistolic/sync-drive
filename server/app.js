@@ -20,8 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static("client"));
 
-app.use("/api/drive", driveRoutes);
-app.use("/api/auth", authRoutes);
+app.use("/api/drive", limiter, driveRoutes);
+app.use("/api/auth", limiter, authRoutes);
 
 // port
 const port = 3000 || process.env.PORT;

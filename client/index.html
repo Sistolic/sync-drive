@@ -153,6 +153,7 @@
       document.addEventListener("DOMContentLoaded", async () => {
         const response = await fetch("/api/auth/session");
 
+        console.log("Response for session:", response);
         if (response.ok) showDefaultFiles();
 
         return;

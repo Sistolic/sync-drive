@@ -28,7 +28,7 @@ function decrypt(encryptedData, ivHex) {
   try {
     const iv = Buffer.from(ivHex, "hex");
     const decipher = crypto.createDecipheriv(
-      this.algorithm,
+      algorithm,
       Buffer.from(key, "hex"),
       iv
     );

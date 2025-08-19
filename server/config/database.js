@@ -49,7 +49,7 @@ class Database {
       };
 
       if (!(await drive.testConnection(credentials)))
-        res.status(404).send("Invalid credentials");
+        return res.status(404).send("Invalid credentials");
 
       const sessionId = uuidv4();
       const encryptedData = encryption.encryptCredentials(credentials);

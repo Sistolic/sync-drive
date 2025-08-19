@@ -35,9 +35,18 @@ async function showDefaultFiles() {
     const response = await fetch(
       `/api/drive/get-folders?folders=${encodedJson}`
     );
-    const data = await response.json();
+    if (!response.ok) {
+      showMessage(await response.text());
+      return;
+    }
 
-    const folderGrid = filesSection.querySelector(".files-grid");
+    const data = await response.json();
+    if (data.length === 0) {
+      showMessage("Folder(s) not found");
+      return;
+    }
+
+    const folderGrid = document.querySelector(".files-grid");
     data.forEach((folder) => {
       folderGrid.innerHTML += createFolderCard(folder);
     });

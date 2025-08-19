@@ -6,6 +6,5 @@ exports.check = async (req, res) => {
   if (!sessionId) return res.status(400).send();
 
   const validate = await db.validateSession(sessionId);
-  console.log(validate);
   return res.status(validate ? 200 : 400).send();
 };

@@ -20,9 +20,14 @@ function showLoading(show = true) {
 async function showDefaultFiles() {
   var defaultFolders = localStorage.getItem("default-folders") || "[]";
   defaultFolders = JSON.parse(defaultFolders);
-  if (defaultFolders.length === 0) return;
 
   try {
+    // Hide the main content
+    document.querySelector(".main-container").style.display = "none";
+    document.querySelector(".files-container").style.display = "block";
+
+    if (defaultFolders.length === 0) return;
+
     showLoading();
 
     const encodedJson = encodeURIComponent(JSON.stringify(defaultFolders));

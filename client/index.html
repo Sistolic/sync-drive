@@ -140,10 +140,6 @@
         if (response.ok) {
           form.reset();
 
-          // Hide the main content
-          document.querySelector(".main-container").style.display = "none";
-          document.querySelector(".files-container").style.display = "block";
-
           showDefaultFiles();
           return;
         }
@@ -153,7 +149,6 @@
       document.addEventListener("DOMContentLoaded", async () => {
         const response = await fetch("/api/auth/session");
 
-        console.log("Response for session:", response);
         if (response.ok) showDefaultFiles();
 
         return;

@@ -34,7 +34,6 @@ class Database {
       [sessionId]
     );
 
-    console.log("Session id found:", rows);
     return rows.length !== 0;
   }
 

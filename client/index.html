@@ -147,10 +147,9 @@
       });
 
       document.addEventListener("DOMContentLoaded", async () => {
-        const response = await fetch("/api/auth/session");
+        const response = await fetch("/api/auth/check");
 
         if (response.ok) showDefaultFiles();
-
         return;
       });
     </script>

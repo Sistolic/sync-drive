@@ -1,12 +1,12 @@
 const dotenv = require("dotenv").config();
 const crypto = require("crypto");
 
-const algorithm = process.env.ALGORITHM;
+const algorithm = "aes-256-cbc";
 
 var key = process.env.ENCRYPTION_KEY;
 key = key.toString("hex");
 
-const IV_LENGTH = parseInt(process.env.IV_LENGTH);
+const IV_LENGTH = 16;
 
 function encrypt(text, iv) {
   try {
@@ -38,7 +38,7 @@ function decrypt(encryptedData, ivHex) {
 
     return decrypted;
   } catch (error) {
-    console.log("Encryption error:", error);
+    console.log("Decryption error:", error);
   }
 }
 
@@ -50,12 +50,14 @@ exports.encryptCredentials = (credentials) => {
     clientSecret: encrypt(credentials.clientSecret, iv),
     refreshToken: encrypt(credentials.refreshToken, iv),
     iv: iv.toString("hex"),
+    redirectUrl: credentials.redirectUrl,
   };
 };
 exports.decryptCredentials = (data) => {
   return {
-    clientId: decrypt(data.client_id, data.iv),
-    clientSecret: decrypt(data.client_secret, data.iv),
-    refreshToken: decrypt(data.refresh_token, data.iv),
+    clientId: decrypt(data.clientId, data.iv),
+    clientSecret: decrypt(data.clientSecret, data.iv),
+    refreshToken: decrypt(data.refreshToken, data.iv),
+    redirectUrl: data.redirectUrl,
   };
 };

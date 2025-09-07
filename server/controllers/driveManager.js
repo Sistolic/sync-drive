@@ -7,23 +7,20 @@ class DriveManager {
 
     this.downloadLimit = 15;
   }
-  async init(sessionId, data) {
-    if (!sessionId) return false; // Authentication failed
+  async init(data) {
+    this.drive = await getDrive();
+    if (!this.drive) return false; // invalid credentials
 
-    const { drive, auth } = await getDrive(sessionId);
-    this.drive = drive;
-
-    // start parameters
     this.targetId = data.folderId;
     this.initialChangeToken = data.changeToken;
     this.nextChangeToken = data.changeToken;
 
-    return true; // Authentication successfull
+    return true;
   }
 
   getFolders = async (req, res) => {
-    if (!(await this.init(req.cookies["session"], req.query)))
-      return res.status(404).send("Authorization required");
+    if (!(await this.init(req.query)))
+      return res.status(404).send("Invalid credentials");
 
     var defaultFolders = JSON.parse(decodeURIComponent(req.query.folders));
     try {
@@ -56,7 +53,7 @@ class DriveManager {
     }
   };
   getFilesFrom = async (req, res) => {
-    if (!(await this.init(req.cookies["session"], req.query)))
+    if (!(await this.init(req.query)))
       return res.status(404).send("Authorization required");
 
     try {
@@ -84,7 +81,7 @@ class DriveManager {
   }
 
   download = async (req, res) => {
-    if (!(await this.init(req.cookies["session"], req.query)))
+    if (!(await this.init(req.query)))
       return res.status(404).send("Authorization required");
 
     try {
@@ -120,8 +117,6 @@ class DriveManager {
 
       await this.downloadDir(fileId, archive);
       archive.finalize();
-
-      console.log("Download time:", new Date() - new Date(start), "ms");
 
       res.status(200);
     } catch (error) {

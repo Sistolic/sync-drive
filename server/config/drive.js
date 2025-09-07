@@ -1,65 +1,98 @@
-const dotenv = require("dotenv").config();
 const { google } = require("googleapis");
+const encryption = require("../utils/encrypt");
 
-const db = require("./database");
+const fs = require("fs");
 
-exports.testConnection = async (credentials) => {
-  if (!credentials) return false;
+class Drive {
+  constructor() {
+    this.drive = null;
 
-  try {
+    this.pathCredentials = "credentials.json";
+    this.activeConnections = new Map();
+  }
+
+  async init(credentials) {
+    // generate the redirect url
     const auth = new google.auth.OAuth2(
       credentials.clientId,
       credentials.clientSecret,
-      process.env.REDIRECT_URL
+      credentials.redirectUrl
     );
+    // TODO generate refresh token with custom scopes
     auth.setCredentials({ refresh_token: credentials.refreshToken });
 
-    const drive = google.drive({
+    this.drive = google.drive({
       version: "v3",
       auth: auth,
     });
-
-    const requestParams = {
-      q: `mimeType='application/vnd.google-apps.folder' and 'me' in owners`,
-      includeItemsFromAllDrives: true,
-      supportsAllDrives: true,
-      orderBy: "name",
-    };
-
-    var response = await drive.files.list(requestParams);
-    return response.data.files ? true : false;
-  } catch (error) {
-    return false;
-  }
-};
-
-const activeConnections = new Map();
-
-exports.getDrive = async (sessionId) => {
-  if (activeConnections.has(sessionId)) {
-    return activeConnections.get(sessionId);
   }
 
-  const credentials = await db.getCredentials(sessionId);
-  if (!credentials) {
-    return;
+  async testConnection(credentials) {
+    if (!credentials) return false;
+    if (!this.drive) this.init(credentials);
+
+    try {
+      const requestParams = {
+        q: `mimeType='application/vnd.google-apps.folder' and 'me' in owners`,
+        includeItemsFromAllDrives: true,
+        supportsAllDrives: true,
+        orderBy: "name",
+      };
+
+      var response = await this.drive.files.list(requestParams);
+      return response.data.files ? true : false;
+    } catch (error) {
+      return false;
+    }
   }
 
-  // TODO refresh token with custom scopes
-  const auth = new google.auth.OAuth2(
-    credentials.clientId,
-    credentials.clientSecret,
-    process.env.REDIRECT_URL || credentials.redirectUrl
-  );
-  auth.setCredentials({ refresh_token: credentials.refreshToken });
+  saveCredentials = async (req, res) => {
+    try {
+      const { clientId, clientSecret, refreshToken } = req.body;
+      const credentials = {
+        clientId: clientId,
+        clientSecret: clientSecret,
+        refreshToken: refreshToken,
+        redirectUrl: "https://developers.google.com/oauthplayground",
+      };
 
-  const drive = google.drive({
-    version: "v3",
-    auth: auth,
-  });
+      if (!(await this.testConnection(credentials)))
+        return res.status(404).send("Invalid credentials");
 
-  const connection = { auth, drive };
-  activeConnections.set(sessionId, connection);
+      const encryptedData = encryption.encryptCredentials(credentials);
 
-  return connection;
-};
+      if (!encryptedData) {
+        return res.status(404).send("Failed to encrypt credentials");
+      }
+
+      // save encrypted credentials
+      fs.writeFileSync(
+        this.pathCredentials,
+        JSON.stringify(encryptedData, null, 2),
+        "utf8"
+      );
+
+      res.status(200).send("Credentials saved in file");
+    } catch (error) {
+      res.status(501).json({ error: error.message });
+    }
+  };
+  async getCredentials() {
+    if (!fs.existsSync(this.pathCredentials)) return undefined;
+    const credentials = JSON.parse(fs.readFileSync(this.pathCredentials));
+
+    return credentials.length !== 0
+      ? encryption.decryptCredentials(credentials)
+      : undefined;
+  }
+
+  getDrive = async () => {
+    const credentials = await this.getCredentials();
+    if (!credentials) return credentials;
+    if (!this.drive) this.init(credentials);
+
+    return this.drive;
+  };
+}
+
+module.exports = new Drive();

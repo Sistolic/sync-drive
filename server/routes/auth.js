@@ -1,7 +1,7 @@
-const express = require("express");
-const db = require("../config/database");
-const session = require("../controllers/session");
+const drive = require("../config/drive");
+const { existsSync } = require("fs");
 
+const express = require("express");
 const router = express.Router();
 
 const middle = express.urlencoded({
@@ -10,10 +10,9 @@ const middle = express.urlencoded({
   parameterLimit: 3,
 });
 
-router.get("/session", session.check);
-router.post("/save", middle, db.saveCredentials);
-
-router.post("/log-out", db.deleteCredentials);
-router.put("/update", db.updateCredentials);
+router.post("/save", middle, drive.saveCredentials);
+router.get("/check", (req, res) => {
+  return res.send(existsSync("credentials.json"));
+});
 
 module.exports = router;

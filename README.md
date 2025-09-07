@@ -1,5 +1,4 @@
 # Google Drive API
----
 
 Node.js project to interact with the Google Drive API.
 Integrate download of files and folders.
